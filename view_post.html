@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Post - MyBlog</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container my-4" id="postContent">
+        <!-- Post content will be loaded here -->
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('id');
+            fetch(`get_post.php?id=${postId}`)
+                .then(response => response.json())
+                .then(post => {
+                    const postContent = document.getElementById('postContent');
+                    postContent.innerHTML = `
+                        <h2>${post.title}</h2>
+                        <p>${post.body}</p>
+                        <p>By ${post.username}</p>
+                        <button class="btn btn-warning" onclick="editPost(${post.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deletePost(${post.id})">Delete</button>
+                        <h3>Comments</h3>
+                        <div id="comments"></div>
+                        <form id="addCommentForm">
+                            <div class="form-group">
+                                <label for="comment">Add Comment</label>
+                                <textarea id="comment" class="form-control" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Comment</button>
+                        </form>
+                    `;
+                    loadComments(post.id);
+                });
+        });
+
+        function loadComments(postId) {
+            fetch(`get_comments.php?post_id=${postId}`)
+                .then(response => response.json())
+                .then(comments => {
+                    const commentsDiv = document.getElementById('comments');
+                    commentsDiv.innerHTML = '';
+                    comments.forEach(comment => {
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'comment';
+                        commentElement.innerHTML = `
+                            <p>${comment.comment}</p>
+                            <p>By ${comment.username}</p>
+                        `;
+                        commentsDiv.appendChild(commentElement);
+                    });
+                });
+        }
+
+        document.getElementById('postContent').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('id');
+            const comment = document.getElementById('comment').value;
+            fetch('add_comment.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `post_id=${postId}&comment=${comment}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                if (data.includes("Comment added successfully")) {
+                    loadComments(postId);
+                }
+            });
+        });
+
+        function editPost(postId) {
+            window.location.href = `edit_post.html?id=${postId}`;
+        }
+
+        function deletePost(postId) {
+            fetch(`delete_post.php?id=${postId}`, {
+                method: 'DELETE'
+            }).then(response => response.text())
+            .then(data => {
+                alert(data);
+                if (data.includes("Post deleted successfully")) {
+                    window.location.href = '.html';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

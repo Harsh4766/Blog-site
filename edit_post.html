@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Post - MyBlog</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container my-4">
+        <h2>Edit Post</h2>
+        <form id="editPostForm">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="body">Body</label>
+                <textarea id="body" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Post</button>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('id');
+            fetch(`get_post.php?id=${postId}`)
+                .then(response => response.json())
+                .then(post => {
+                    document.getElementById('title').value = post.title;
+                    document.getElementById('body').value = post.body;
+                });
+
+            document.getElementById('editPostForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const title = document.getElementById('title').value;
+                const body = document.getElementById('body').value;
+                fetch('edit_post.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `id=${postId}&title=${title}&body=${body}`
+                })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    if (data.includes("Post updated successfully")) {
+                        window.location.href = 'home.html';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

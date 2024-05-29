@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    margin-bottom: 20px;
+}
+
+.post {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.post h2 {
+    margin: 0;
+}
+
+.comment {
+    margin-left: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-left: 3px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.nav-link{
+    color: #fff;
+}
+
